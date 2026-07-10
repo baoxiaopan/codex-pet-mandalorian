@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "reviewed_by": "independent_visual_qa_worker",
+  "directions": [
+    {"degree":"000","expected":"up","verdict":"pass","observed":"centered and unmistakably up","horizontal_evidence":"symmetric ears and centered muzzle","vertical_evidence":"chin, muzzle, and visor pitch up","reason":"cardinal is unambiguous"},
+    {"degree":"022.5","expected":"up-right","verdict":"warning","observed":"subtle up-right","horizontal_evidence":"nose and visor turn slightly screen-right","vertical_evidence":"raised muzzle clearly reads up","reason":"horizontal axis was blind-ambiguous but labeled loop remains coherent"},
+    {"degree":"045","expected":"up-right","verdict":"pass","observed":"clear up-right","horizontal_evidence":"face yaws screen-right","vertical_evidence":"chin remains raised","reason":"both axes are readable"},
+    {"degree":"067.5","expected":"up-right","verdict":"pass","observed":"strong right with slight up","horizontal_evidence":"strong screen-right turn","vertical_evidence":"slight upward pitch remains visible","reason":"ordered progression is clear"},
+    {"degree":"090","expected":"right","verdict":"pass","observed":"unmistakable right","horizontal_evidence":"full screen-right profile","vertical_evidence":"level neutral pitch","reason":"cardinal is unambiguous"},
+    {"degree":"112.5","expected":"down-right","verdict":"warning","observed":"right with subtle down","horizontal_evidence":"face remains clearly screen-right","vertical_evidence":"downward pitch is subtle","reason":"labeled progression confirms the down-right quadrant"},
+    {"degree":"135","expected":"down-right","verdict":"pass","observed":"clear down-right","horizontal_evidence":"nose and visor read screen-right","vertical_evidence":"lowered head clearly reads down","reason":"both axes are readable"},
+    {"degree":"157.5","expected":"down-right","verdict":"warning","observed":"near-centered down with slight right bias","horizontal_evidence":"right cue is subtle and blind-ambiguous","vertical_evidence":"bowed visor and muzzle clearly read down","reason":"one coherent step before 180 without reversal"},
+    {"degree":"180","expected":"down","verdict":"pass","observed":"centered and unmistakably down","horizontal_evidence":"symmetric ears and centered muzzle","vertical_evidence":"deeply bowed head","reason":"cardinal is unambiguous"},
+    {"degree":"202.5","expected":"down-left","verdict":"warning","observed":"left with subtle down","horizontal_evidence":"nose and face turn screen-left","vertical_evidence":"down cue is subtle","reason":"immediate post-180 progression remains coherent"},
+    {"degree":"225","expected":"down-left","verdict":"pass","observed":"clear down-left","horizontal_evidence":"clear screen-left profile","vertical_evidence":"lowered muzzle reads down","reason":"both axes are readable"},
+    {"degree":"247.5","expected":"down-left","verdict":"warning","observed":"strong left with subtle down","horizontal_evidence":"strong screen-left turn","vertical_evidence":"downward axis is subtle near the left cardinal","reason":"quadrant and ordered progression remain coherent"},
+    {"degree":"270","expected":"left","verdict":"pass","observed":"unmistakable left","horizontal_evidence":"full screen-left profile","vertical_evidence":"level neutral pitch","reason":"cardinal is unambiguous"},
+    {"degree":"292.5","expected":"up-left","verdict":"warning","observed":"left with subtle rise","horizontal_evidence":"face remains clearly screen-left","vertical_evidence":"upward cue is subtle and blind-inconsistent","reason":"labeled loop begins a continuous rise toward 337.5"},
+    {"degree":"315","expected":"up-left","verdict":"warning","observed":"left with mild up","horizontal_evidence":"leftward nose and visor remain visible","vertical_evidence":"lift is mild and blind-inconsistent","reason":"ordered upward progression remains continuous"},
+    {"degree":"337.5","expected":"up-left","verdict":"warning","observed":"near-centered up with slight left bias","horizontal_evidence":"left cue is subtle and blind-ambiguous","vertical_evidence":"raised chin and visor unmistakably read up","reason":"one coherent step before 000 without reversal"}
+  ]
+}

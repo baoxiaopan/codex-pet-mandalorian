@@ -1,0 +1,12 @@
+{
+  "visual_qa": "pass",
+  "reviewed_by": "independent_visual_qa_worker",
+  "summary": "Identity and standard-row semantics remain consistent across all 11 rows; deterministic atlas and chroma checks pass; the repaired 16-direction loop has no conspicuous boundary snap.",
+  "accepted_warnings": [
+    "Intermediate blind-axis uncertainty is accepted where labeled normal-size review preserves the intended quadrant without reversal.",
+    "157.5 to 180 keeps upright body registration and comparable scale without a visible snap.",
+    "337.5 to 000 shows a natural final increase in upward head pitch and frontal silhouette without a conspicuous baseline jump.",
+    "Reported alpha holes are natural negative space between ears, raised muzzle, and separated body contours; no visible interior seam is present."
+  ],
+  "repair_rows": []
+}

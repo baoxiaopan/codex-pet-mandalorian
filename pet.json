@@ -1,0 +1,7 @@
+{
+  "id": "mandalorian",
+  "displayName": "Mandalorian",
+  "description": "A calm, loyal armored fox-cat code guardian who tracks bugs, flaky tests, and messy diffs with tactical focus.",
+  "spriteVersionNumber": 2,
+  "spritesheetPath": "spritesheet.webp"
+}
