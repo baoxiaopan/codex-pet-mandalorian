@@ -253,6 +253,8 @@ cd codex-pet-mandalorian
 ./scripts/install.sh
 ```
 
+SSH is also available as an optional alternative: `git@github.com:baoxiaopan/codex-pet-mandalorian.git`.
+
 The installer copies the package to:
 
 ```text
@@ -282,7 +284,7 @@ git pull --ff-only
 
 ## Verify
 
-Verify the published package bytes:
+Verify the published package bytes before installation:
 
 ```bash
 shasum -a 256 -c SHA256SUMS
@@ -353,6 +355,12 @@ rm -r "${CODEX_HOME:-$HOME/.codex}/pets/mandalorian"
 Mandalorian is an original fox-cat mascot inspired only by broad armored-guardian and space-western themes. It does not depict or copy a known franchise protagonist, protected helmet or armor design, insignia, named lore, companion character, weapon, or catchphrase.
 
 The name identifies this custom Codex pet. No affiliation with or endorsement by any entertainment franchise is claimed.
+
+## License
+
+This repository uses a dual-license policy. Scripts, documentation, metadata, QA JSON, and checksum files are available under the [MIT License](LICENSE-MIT). `spritesheet.webp` and image files under `assets/` are available under the [Creative Commons Attribution 4.0 International license](LICENSE-CC-BY-4.0). See the concise [license map](LICENSE.md) for file-level scope.
+
+Artwork reuse requires appropriate credit to Baoxiaopan, a link to the [CC BY 4.0 license](https://creativecommons.org/licenses/by/4.0/), and an indication of whether changes were made.
 ````
 
 - [ ] **Step 2: Validate README links and commands**
