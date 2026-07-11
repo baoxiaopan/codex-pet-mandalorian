@@ -12,6 +12,10 @@ Publish the verified Mandalorian Codex v2 pet as a small, reusable GitHub reposi
 ```text
 codex-pet-mandalorian/
 ├── README.md
+├── LICENSE.md
+├── LICENSE-MIT
+├── LICENSE-CC-BY-4.0
+├── SHA256SUMS
 ├── pet.json
 ├── spritesheet.webp
 ├── assets/
@@ -28,7 +32,7 @@ codex-pet-mandalorian/
     └── 2026-07-10-repository-publishing-design.md
 ```
 
-The repository contains the installable pet package and a curated public QA set. Internal generation prompts, blind-test answer keys, temporary rows, decoded frames, and other production intermediates are excluded.
+The repository contains the installable pet package, a curated public QA set, package checksums, and explicit dual-license artifacts. Internal generation prompts, blind-test answer keys, temporary rows, decoded frames, and other production intermediates are excluded.
 
 ## README Contract
 
@@ -50,8 +54,10 @@ The README will include:
 2. verify that `pet.json` and `spritesheet.webp` exist
 3. verify that `pet.json` declares `id: mandalorian` and `spriteVersionNumber: 2`
 4. create `${CODEX_HOME:-$HOME/.codex}/pets/mandalorian`
-5. copy both package files together
-6. print the installed location and a concise completion message
+5. stage both package files on the destination filesystem
+6. validate and compare the staged files to their sources
+7. atomically promote the atlas first and the manifest last
+8. clean staged files through a trap and print the installed location
 
 The script must stop on errors and must not delete unrelated files or modify global Codex configuration.
 
@@ -64,6 +70,7 @@ Before publishing:
 - confirm the curated QA JSON files report successful deterministic and visual checks
 - confirm no direction semantic verdict is `fail`
 - compare the repository spritesheet hash with the locally verified installed package
+- verify `pet.json` and `spritesheet.webp` against `SHA256SUMS`
 - run the installation script against an isolated temporary `CODEX_HOME` and compare installed hashes
 - inspect `git status --short` and `git diff --stat` before committing
 

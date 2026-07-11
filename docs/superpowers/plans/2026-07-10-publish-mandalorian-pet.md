@@ -31,9 +31,10 @@
 - Create: `qa/chroma-despill.json`
 - Create: `qa/direction-semantics.json`
 - Create: `qa/final-visual-qa.json`
+- Create: `SHA256SUMS`
 
 **Interfaces:**
-- Consumes: verified artifacts from `/Users/baoxiaopan/.codex/pets/mandalorian` and `/Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian`
+- Consumes: verified artifacts from the required environment-variable source locations `SOURCE_PET_DIR` and `SOURCE_RUN_DIR`
 - Produces: a self-contained root pet package and public QA files consumed by the installer and README
 
 - [ ] **Step 1: Verify the source package before copying**
@@ -41,11 +42,13 @@
 Run:
 
 ```bash
+test -n "${SOURCE_PET_DIR:?Set SOURCE_PET_DIR to the verified installed pet directory}"
+test -n "${SOURCE_RUN_DIR:?Set SOURCE_RUN_DIR to the verified hatch-pet run directory}"
 jq -e '.id == "mandalorian" and .spriteVersionNumber == 2 and .spritesheetPath == "spritesheet.webp"' \
-  /Users/baoxiaopan/.codex/pets/mandalorian/pet.json
+  "$SOURCE_PET_DIR/pet.json"
 shasum -a 256 \
-  /Users/baoxiaopan/.codex/pets/mandalorian/spritesheet.webp \
-  /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/final/spritesheet-extended.webp
+  "$SOURCE_PET_DIR/spritesheet.webp" \
+  "$SOURCE_RUN_DIR/final/spritesheet-extended.webp"
 ```
 
 Expected: jq prints `true`; both SHA-256 values are identical.
@@ -56,10 +59,10 @@ Run:
 
 ```bash
 mkdir -p assets qa
-cp /Users/baoxiaopan/.codex/pets/mandalorian/pet.json pet.json
-cp /Users/baoxiaopan/.codex/pets/mandalorian/spritesheet.webp spritesheet.webp
-cp /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/qa/contact-sheet-extended.png assets/contact-sheet.png
-cp /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/qa/look-directions.png assets/look-directions.png
+cp "$SOURCE_PET_DIR/pet.json" pet.json
+cp "$SOURCE_PET_DIR/spritesheet.webp" spritesheet.webp
+cp "$SOURCE_RUN_DIR/qa/contact-sheet-extended.png" assets/contact-sheet.png
+cp "$SOURCE_RUN_DIR/qa/look-directions.png" assets/look-directions.png
 ```
 
 Expected: all four destination files exist.
@@ -70,28 +73,31 @@ Run:
 
 ```bash
 jq '.file = "spritesheet.webp"' \
-  /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/final/validation-extended.json \
+  "$SOURCE_RUN_DIR/final/validation-extended.json" \
   > qa/validation.json
 jq '.input = "spritesheet.webp" | .output = "spritesheet.webp"' \
-  /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/qa/chroma-despill-extended.json \
+  "$SOURCE_RUN_DIR/qa/chroma-despill-extended.json" \
   > qa/chroma-despill.json
-cp /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/qa/direction-semantics.json qa/direction-semantics.json
-cp /Users/baoxiaopan/workspace/dailywork/output/hatch-pet/mandalorian/qa/final-visual-qa.json qa/final-visual-qa.json
+cp "$SOURCE_RUN_DIR/qa/direction-semantics.json" qa/direction-semantics.json
+cp "$SOURCE_RUN_DIR/qa/final-visual-qa.json" qa/final-visual-qa.json
 ```
 
-Expected: the files contain no `/Users/baoxiaopan` path and retain their successful verdicts.
+Expected: the files contain no private absolute production path and retain their successful verdicts.
 
 - [ ] **Step 4: Validate the copied package and curated QA**
 
 Run:
 
 ```bash
-shasum -a 256 spritesheet.webp /Users/baoxiaopan/.codex/pets/mandalorian/spritesheet.webp
+shasum -a 256 spritesheet.webp "$SOURCE_PET_DIR/spritesheet.webp"
+shasum -a 256 pet.json spritesheet.webp > SHA256SUMS
+shasum -a 256 -c SHA256SUMS
 jq -e '.ok == true and .width == 1536 and .height == 2288 and .rows == 11 and .columns == 8' qa/validation.json
 jq -e '.ok == true and .alpha_preserved == true' qa/chroma-despill.json
 jq -e '.ok == true and (.directions | length == 16) and ([.directions[].verdict] | all(. != "fail"))' qa/direction-semantics.json
 jq -e '.visual_qa == "pass"' qa/final-visual-qa.json
-! rg -n '/Users/baoxiaopan|direction-blind-answer-key|prompts/' pet.json qa assets
+PRIVATE_USERS_PREFIX="/""Users/"
+! rg -n "${PRIVATE_USERS_PREFIX}[^/[:space:]]+|direction-blind-answer-key|prompts/" README.md pet.json SHA256SUMS LICENSE* qa scripts docs/superpowers/specs docs/superpowers/plans
 ```
 
 Expected: hashes match; every jq command prints `true`; the privacy scan returns no matches.
@@ -99,7 +105,7 @@ Expected: hashes match; every jq command prints `true`; the privacy scan returns
 - [ ] **Step 5: Commit the verified package**
 
 ```bash
-git add pet.json spritesheet.webp assets qa
+git add pet.json spritesheet.webp assets qa SHA256SUMS
 git commit -m "add verified Mandalorian pet package"
 ```
 
@@ -128,7 +134,7 @@ Expected: exit code 0.
 
 - [ ] **Step 2: Create the guarded installer**
 
-Create `scripts/install.sh` with exactly:
+Implement `scripts/install.sh` with this failure-safe flow (the repository script is authoritative for the complete implementation):
 
 ```bash
 #!/usr/bin/env bash
@@ -162,8 +168,9 @@ if ! jq -e '.id == "mandalorian" and .spriteVersionNumber == 2 and .spritesheetP
 fi
 
 mkdir -p "$PET_DIR"
-cp "$PET_JSON" "$PET_DIR/pet.json"
-cp "$SPRITESHEET" "$PET_DIR/spritesheet.webp"
+STAGED_PET_JSON="$(mktemp "$PET_DIR/.pet.json.tmp.XXXXXX")"
+STAGED_SPRITESHEET="$(mktemp "$PET_DIR/.spritesheet.webp.tmp.XXXXXX")"
+# Copy and validate both staged files, then promote spritesheet.webp first and pet.json last.
 
 echo "Installed Mandalorian to $PET_DIR"
 ```
@@ -188,6 +195,7 @@ TEST_CODEX_HOME="$(mktemp -d)"
 CODEX_HOME="$TEST_CODEX_HOME" ./scripts/install.sh
 jq -e '.id == "mandalorian" and .spriteVersionNumber == 2' "$TEST_CODEX_HOME/pets/mandalorian/pet.json"
 shasum -a 256 spritesheet.webp "$TEST_CODEX_HOME/pets/mandalorian/spritesheet.webp"
+cmp pet.json "$TEST_CODEX_HOME/pets/mandalorian/pet.json"
 ```
 
 Expected: installer reports the isolated path; jq prints `true`; hashes match.
@@ -240,7 +248,7 @@ This repository contains a complete Codex v2 pet package with nine standard anim
 Clone the repository and run the installer:
 
 ```bash
-git clone git@github.com:baoxiaopan/codex-pet-mandalorian.git
+git clone https://github.com/baoxiaopan/codex-pet-mandalorian.git
 cd codex-pet-mandalorian
 ./scripts/install.sh
 ```
@@ -273,6 +281,12 @@ git pull --ff-only
 ```
 
 ## Verify
+
+Verify the published package bytes:
+
+```bash
+shasum -a 256 -c SHA256SUMS
+```
 
 Confirm the manifest:
 
@@ -313,6 +327,10 @@ rm -r "${CODEX_HOME:-$HOME/.codex}/pets/mandalorian"
 ```text
 .
 ├── README.md
+├── LICENSE.md
+├── LICENSE-MIT
+├── LICENSE-CC-BY-4.0
+├── SHA256SUMS
 ├── pet.json
 ├── spritesheet.webp
 ├── assets/
@@ -349,7 +367,8 @@ for path in \
   qa/chroma-despill.json \
   qa/direction-semantics.json \
   qa/final-visual-qa.json \
-  scripts/install.sh; do
+  scripts/install.sh \
+  LICENSE.md LICENSE-MIT LICENSE-CC-BY-4.0 SHA256SUMS; do
   test -e "$path"
 done
 rg -n 'Install|Manual Installation|Update|Verify|Uninstall|Repository Layout|IP Boundary' README.md
@@ -388,11 +407,13 @@ jq -e '.ok == true and .width == 1536 and .height == 2288 and .rows == 11 and .c
 jq -e '.ok == true and .alpha_preserved == true' qa/chroma-despill.json
 jq -e '.ok == true and (.directions | length == 16) and ([.directions[].verdict] | all(. != "fail"))' qa/direction-semantics.json
 jq -e '.visual_qa == "pass"' qa/final-visual-qa.json
+shasum -a 256 -c SHA256SUMS
 TEST_CODEX_HOME="$(mktemp -d)"
 CODEX_HOME="$TEST_CODEX_HOME" ./scripts/install.sh
 cmp spritesheet.webp "$TEST_CODEX_HOME/pets/mandalorian/spritesheet.webp"
 cmp pet.json "$TEST_CODEX_HOME/pets/mandalorian/pet.json"
-! rg -n '/Users/baoxiaopan|direction-blind-answer-key|prompts/' README.md pet.json qa scripts docs/superpowers/specs
+PRIVATE_USERS_PREFIX="/""Users/"
+! rg -n "${PRIVATE_USERS_PREFIX}[^/[:space:]]+|direction-blind-answer-key|prompts/" README.md pet.json SHA256SUMS LICENSE* qa scripts docs/superpowers/specs docs/superpowers/plans
 ```
 
 Expected: all commands exit 0; jq checks print `true`; installed files match byte-for-byte; privacy scan finds no forbidden content.
