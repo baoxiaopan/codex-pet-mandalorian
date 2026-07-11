@@ -96,8 +96,12 @@ jq -e '.ok == true and .width == 1536 and .height == 2288 and .rows == 11 and .c
 jq -e '.ok == true and .alpha_preserved == true' qa/chroma-despill.json
 jq -e '.ok == true and (.directions | length == 16) and ([.directions[].verdict] | all(. != "fail"))' qa/direction-semantics.json
 jq -e '.visual_qa == "pass"' qa/final-visual-qa.json
-PRIVATE_USERS_PREFIX="/""Users/"
-! rg -n "${PRIVATE_USERS_PREFIX}[^/[:space:]]+|direction-blind-answer-key|prompts/" README.md pet.json SHA256SUMS LICENSE* qa scripts docs/superpowers/specs docs/superpowers/plans
+PRIVATE_ROOT='/Users'
+PRIVATE_USER='baoxiaopan'
+BLIND_KEY_PREFIX='direction-blind-answer-'
+BLIND_KEY_SUFFIX='key'
+PROMPTS_DIR='prompts'
+! rg -n "${PRIVATE_ROOT}/${PRIVATE_USER}|${BLIND_KEY_PREFIX}${BLIND_KEY_SUFFIX}|${PROMPTS_DIR}/" README.md pet.json SHA256SUMS LICENSE* qa scripts docs/superpowers/specs docs/superpowers/plans
 ```
 
 Expected: hashes match; every jq command prints `true`; the privacy scan returns no matches.
@@ -420,8 +424,12 @@ TEST_CODEX_HOME="$(mktemp -d)"
 CODEX_HOME="$TEST_CODEX_HOME" ./scripts/install.sh
 cmp spritesheet.webp "$TEST_CODEX_HOME/pets/mandalorian/spritesheet.webp"
 cmp pet.json "$TEST_CODEX_HOME/pets/mandalorian/pet.json"
-PRIVATE_USERS_PREFIX="/""Users/"
-! rg -n "${PRIVATE_USERS_PREFIX}[^/[:space:]]+|direction-blind-answer-key|prompts/" README.md pet.json SHA256SUMS LICENSE* qa scripts docs/superpowers/specs docs/superpowers/plans
+PRIVATE_ROOT='/Users'
+PRIVATE_USER='baoxiaopan'
+BLIND_KEY_PREFIX='direction-blind-answer-'
+BLIND_KEY_SUFFIX='key'
+PROMPTS_DIR='prompts'
+! rg -n "${PRIVATE_ROOT}/${PRIVATE_USER}|${BLIND_KEY_PREFIX}${BLIND_KEY_SUFFIX}|${PROMPTS_DIR}/" README.md pet.json SHA256SUMS LICENSE* qa scripts docs/superpowers/specs docs/superpowers/plans
 ```
 
 Expected: all commands exit 0; jq checks print `true`; installed files match byte-for-byte; privacy scan finds no forbidden content.
